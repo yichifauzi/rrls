@@ -32,13 +32,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class GameRendererMixin {
     @Shadow
     @Final
-    Minecraft minecraft;
+    private Minecraft minecraft;
 
     @Inject(
             method = "render",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"
+                    target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V",
+                    ordinal = 1
             )
     )
     public void rrls$miniRender(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci, @Local(ordinal = 0) GuiGraphics graphics) {
@@ -46,11 +47,9 @@ public class GameRendererMixin {
             Overlay overlay = this.minecraft.overlay;
 
             if (OverlayHelper.isRenderingState(overlay)) {
-                rrls$enableScissor(graphics, () ->
-                        overlay.render(DummyGuiGraphics.INSTANCE, 0, 0,
-                                deltaTracker.getGameTimeDeltaPartialTick(false) // Neo: Fix https://bugs.mojang.com/browse/MC-273464
-                        )
-                );
+                rrls$enableScissor(graphics, () -> overlay.render(
+                        DummyGuiGraphics.INSTANCE, 0, 0, deltaTracker.getGameTimeDeltaTicks()
+                ));
 
                 if (ConfigExpectPlatform.miniRender())
                     overlay.rrls$miniRender(graphics);

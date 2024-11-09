@@ -10,6 +10,7 @@
 
 package org.redlance.dima_dencep.mods.rrls.mixins.compat;
 
+import com.mojang.blaze3d.platform.FramerateLimitTracker;
 import org.redlance.dima_dencep.mods.rrls.utils.OverlayHelper;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -24,7 +25,8 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = {
         GameRenderer.class,
         KeyboardHandler.class,
-        MouseHandler.class
+        MouseHandler.class,
+        FramerateLimitTracker.class
 })
 public class RendererKeyboardMouseMixin {
     @WrapOperation(
