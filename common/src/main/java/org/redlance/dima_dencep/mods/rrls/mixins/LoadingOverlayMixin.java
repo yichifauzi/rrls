@@ -53,6 +53,8 @@ public abstract class LoadingOverlayMixin extends Overlay {
 
     @Unique
     private FocusableTextWidget rrls$textWidget;
+    @Unique
+    private float rrls$fadeOutTime;
 
     @Inject(
             method = "<init>",
@@ -77,7 +79,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 int s = (int) ((double) j * 0.8325);
                 int r = (int) (Math.min(i * 0.75, j) * 0.5);
 
-                this.drawProgressBar(graphics, i / 2 - r, s - 5, i / 2 + r, s + 5, 0.8F);
+                this.drawProgressBar(graphics, i / 2 - r, s - 5, i / 2 + r, s + 5, Math.max(0.1F, this.rrls$fadeOutTime));
             }
 
             case Type.TEXT -> graphics.drawCenteredString(
@@ -98,7 +100,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                     graphics.pose().pushPose();
                     graphics.pose().translate(0, 0,255);
 
-                    rrls$textWidget.render(graphics, 0, 0, 0);
+                    rrls$textWidget.render(graphics, 0, 0, this.rrls$fadeOutTime);
 
                     graphics.pose().popPose();
                 }
@@ -127,6 +129,17 @@ public abstract class LoadingOverlayMixin extends Overlay {
     public void rrls$render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (rrls$getState() != OverlayHelper.State.DEFAULT) // Update attach (Optifine ❤️)
             rrls$setState(OverlayHelper.lookupState(minecraft.screen, rrls$getState() != OverlayHelper.State.WAIT));
+    }
+
+    @WrapOperation(
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screens/LoadingOverlay;drawProgressBar(Lnet/minecraft/client/gui/GuiGraphics;IIIIF)V"
+            )
+    )
+    public void rrls$hookPartialTick(LoadingOverlay instance, GuiGraphics guiGraphics, int minX, int minY, int maxX, int maxY, float partialTick, Operation<Void> original) {
+        instance.drawProgressBar(guiGraphics, minX, minY, maxX, maxY, this.rrls$fadeOutTime = partialTick);
     }
 
     @WrapWithCondition(

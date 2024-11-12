@@ -27,6 +27,7 @@ accessible method net/minecraft/client/gui/GuiGraphics renderItemCooldown (Lnet/
 extendable method net/minecraft/client/gui/GuiGraphics renderItemCooldown (Lnet/minecraft/world/item/ItemStack;II)V
 accessible field net/minecraft/client/Minecraft overlay Lnet/minecraft/client/gui/screens/Overlay;
 accessible class net/minecraft/client/resources/server/ServerPackManager$ServerPackData
+accessible method net/minecraft/client/gui/screens/LoadingOverlay drawProgressBar (Lnet/minecraft/client/gui/GuiGraphics;IIIIF)V
 accessible field net/minecraft/client/gui/screens/LoadingOverlay currentProgress F
 accessible class net/minecraft/client/Minecraft$GameLoadCookie
 accessible field net/minecraft/client/gui/font/FontManager fontSets Ljava/util/Map;
