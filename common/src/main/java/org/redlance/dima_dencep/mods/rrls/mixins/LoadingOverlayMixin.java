@@ -19,6 +19,7 @@ import org.redlance.dima_dencep.mods.rrls.utils.OverlayHelper;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import org.redlance.dima_dencep.mods.rrls.utils.RainbowUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,7 +31,6 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -84,7 +84,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
 
             case Type.TEXT -> graphics.drawCenteredString(
                     minecraft.font, ConfigExpectPlatform.reloadText(), i / 2, 70,
-                    ConfigExpectPlatform.rgbProgress() ? ThreadLocalRandom.current().nextInt(0, 0xFFFFFF) : -1
+                    ConfigExpectPlatform.rgbProgress() ? RainbowUtils.rainbowColor() : -1
             );
 
             case Type.TEXT_WITH_BACKGROUND -> {
@@ -94,7 +94,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                     rrls$textWidget.setY(j - j / 3);
 
                     if (ConfigExpectPlatform.rgbProgress())
-                        rrls$textWidget.setColor(ThreadLocalRandom.current().nextInt(0, 0xFFFFFF));
+                        rrls$textWidget.setColor(RainbowUtils.rainbowColor());
 
                     // This will make sure the widget is rendered above other widgets in Pause screen
                     graphics.pose().pushPose();
@@ -212,7 +212,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
     )
     public int rrls$rainbowProgress(int alpha, int red, int green, int blue, Operation<Integer> original) {
         if (ConfigExpectPlatform.rgbProgress() && rrls$getState() != OverlayHelper.State.DEFAULT) {
-            return replaceAlpha(ThreadLocalRandom.current().nextInt(0, 0xFFFFFF), alpha);
+            return replaceAlpha(RainbowUtils.rainbowColor(), alpha);
         }
 
         return original.call(alpha, red, green, blue);
