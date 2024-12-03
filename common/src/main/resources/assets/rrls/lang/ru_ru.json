@@ -26,6 +26,7 @@
   "rrls.configuration.type.progress": "Прогресс-бар",
   "rrls.configuration.type.text": "Пользовательский текст",
   "rrls.configuration.type.textbg": "Пользовательский текст с фоном",
+  "rrls.configuration.type.none": "Ничего",
   "rrls.configuration.hide.all": "Все наложения",
   "rrls.configuration.hide.loading": "Только загрузка",
   "rrls.configuration.hide.reloading": "Только перезагрузка",

@@ -16,7 +16,8 @@ import net.neoforged.neoforge.common.TranslatableEnum;
 public enum Type implements TranslatableEnum {
     PROGRESS(Component.translatable("rrls.configuration.type.progress")),
     TEXT(Component.translatable("rrls.configuration.type.text")),
-    TEXT_WITH_BACKGROUND(Component.translatable("rrls.configuration.type.textbg"));
+    TEXT_WITH_BACKGROUND(Component.translatable("rrls.configuration.type.textbg")),
+    NONE(Component.translatable("rrls.configuration.type.none"));
 
     private final Component translatedName;
 

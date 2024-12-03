@@ -26,6 +26,7 @@
   "rrls.configuration.type.progress": "Progress Bar",
   "rrls.configuration.type.text": "Custom text",
   "rrls.configuration.type.textbg": "Custom text with background",
+  "rrls.configuration.type.none": "Nothing",
   "rrls.configuration.hide.all": "All overlays",
   "rrls.configuration.hide.loading": "Loading only",
   "rrls.configuration.hide.reloading": "Reloading only",

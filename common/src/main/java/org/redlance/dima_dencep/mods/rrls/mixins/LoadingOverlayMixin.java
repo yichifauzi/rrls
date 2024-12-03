@@ -107,6 +107,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                     graphics.pose().popPose();
                 }
             }
+            case NONE -> {}
         }
     }
 
