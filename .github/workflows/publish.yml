@@ -107,7 +107,7 @@ jobs:
             ${{ steps.read_property.outputs.minecraft_version }}
 
           dependencies: |
-            forge-config-api-port
+            forge-config-api-port{modrinth:ohNO6lps}{curseforge:547434}
 
           java: |
             21
