@@ -21,4 +21,8 @@ public interface OverlayExtender {
     default void rrls$miniRender(GuiGraphics graphics) {
         throw new UnsupportedOperationException("The '" + getClass().getCanonicalName() + "' overlay doesn't have a mini-render!");
     }
+
+    default void rrls$resetProgress() {
+        // NO-OP
+    }
 }

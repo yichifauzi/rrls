@@ -17,6 +17,7 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import org.redlance.dima_dencep.mods.rrls.Rrls;
 import net.fabricmc.api.ClientModInitializer;
 import org.redlance.dima_dencep.mods.rrls.RrlsConfig;
+import org.redlance.dima_dencep.mods.rrls.screens.ConfigurationSectionScreenProxy;
 
 public class RrlsFabric extends Rrls implements ClientModInitializer {
     @Override
@@ -24,7 +25,9 @@ public class RrlsFabric extends Rrls implements ClientModInitializer {
         NeoForgeConfigRegistry.INSTANCE.register(Rrls.MOD_ID, ModConfig.Type.CLIENT,
                 RrlsConfig.CONFIG_SPEC_PAIR.getRight(), "rrls.toml"
         );
-        ConfigScreenFactoryRegistry.INSTANCE.register(Rrls.MOD_ID, ConfigurationScreen::new);
+        ConfigScreenFactoryRegistry.INSTANCE.register(Rrls.MOD_ID, (modContainer, screen) ->
+                new ConfigurationScreen(modContainer, screen, ConfigurationSectionScreenProxy::new)
+        );
 
         // After loading config, we load the future stuff
         super.onInitializeClient();

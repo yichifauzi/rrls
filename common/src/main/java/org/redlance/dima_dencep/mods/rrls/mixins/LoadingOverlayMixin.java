@@ -47,12 +47,17 @@ public abstract class LoadingOverlayMixin extends Overlay {
     @Final
     private Minecraft minecraft;
     @Shadow
-    protected abstract void drawProgressBar(GuiGraphics guiGraphics, int minX, int minY, int maxX, int maxY, float partialTick);
+    public float currentProgress;
     @Shadow
     private static int replaceAlpha(int color, int alpha) {
         return 0;
     }
 
+    private long fadeOutStart;
+    @Shadow
+    private long fadeInStart;
+    @Shadow
+    public abstract void drawProgressBar(GuiGraphics guiGraphics, int minX, int minY, int maxX, int maxY, float partialTick);
     @Unique
     private FocusableTextWidget rrls$textWidget;
     @Unique
@@ -111,15 +116,11 @@ public abstract class LoadingOverlayMixin extends Overlay {
         }
     }
 
-    @Inject(
-            method = "render",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/Minecraft;setOverlay(Lnet/minecraft/client/gui/screens/Overlay;)V"
-            )
-    )
-    public void rrls$onLoadDone(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        this.rrls$textWidget = null;
+    @Override
+    public void rrls$resetProgress() {
+        this.currentProgress = 0;
+        this.fadeOutStart = -1L;
+        this.fadeInStart = -1L;
     }
 
     @Inject(

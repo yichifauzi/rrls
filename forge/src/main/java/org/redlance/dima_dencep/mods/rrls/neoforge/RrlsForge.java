@@ -18,12 +18,15 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.redlance.dima_dencep.mods.rrls.Rrls;
 import net.neoforged.fml.common.Mod;
 import org.redlance.dima_dencep.mods.rrls.RrlsConfig;
+import org.redlance.dima_dencep.mods.rrls.screens.ConfigurationSectionScreenProxy;
 
 @Mod(value = Rrls.MOD_ID, dist = Dist.CLIENT)
 public class RrlsForge extends Rrls {
     public RrlsForge(ModContainer container) {
         container.registerConfig(ModConfig.Type.CLIENT, RrlsConfig.CONFIG_SPEC_PAIR.getValue(), "rrls.toml");
-        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) ->
+                new ConfigurationScreen(modContainer, screen, ConfigurationSectionScreenProxy::new)
+        );
 
         // After loading config, we load the future stuff
         super.onInitializeClient();
