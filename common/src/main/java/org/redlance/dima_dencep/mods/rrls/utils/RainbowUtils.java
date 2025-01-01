@@ -19,11 +19,11 @@ public class RainbowUtils {
         return (1F + Mth.sin(speed * shift + offset)) * 0.5F;
     }
 
-    public static int rainbowColor() {
+    public static int rainbowColor(float alpha) {
         float time = Util.getNanos() * 1E-9F;
         float speed = 0.5F; // TODO config
 
-        return ARGB.colorFromFloat(1F,
+        return ARGB.colorFromFloat(alpha,
                 makeChannel(speed, time, 0),
                 makeChannel(speed, time, 2),
                 makeChannel(speed, time, 4)

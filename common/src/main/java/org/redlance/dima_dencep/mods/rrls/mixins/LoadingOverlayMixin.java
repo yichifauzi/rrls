@@ -11,8 +11,10 @@
 package org.redlance.dima_dencep.mods.rrls.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.Util;
 import net.minecraft.client.gui.components.FocusableTextWidget;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.redlance.dima_dencep.mods.rrls.RrlsConfig;
 import org.redlance.dima_dencep.mods.rrls.config.Type;
@@ -49,10 +51,6 @@ public abstract class LoadingOverlayMixin extends Overlay {
     @Shadow
     public float currentProgress;
     @Shadow
-    private static int replaceAlpha(int color, int alpha) {
-        return 0;
-    }
-
     private long fadeOutStart;
     @Shadow
     private long fadeInStart;
@@ -60,8 +58,6 @@ public abstract class LoadingOverlayMixin extends Overlay {
     public abstract void drawProgressBar(GuiGraphics guiGraphics, int minX, int minY, int maxX, int maxY, float partialTick);
     @Unique
     private FocusableTextWidget rrls$textWidget;
-    @Unique
-    private float rrls$fadeOutTime;
 
     @Inject(
             method = "<init>",
@@ -81,17 +77,29 @@ public abstract class LoadingOverlayMixin extends Overlay {
         int i = graphics.guiWidth();
         int j = graphics.guiHeight();
 
+        float ease = 1.0F;
+        if (RrlsConfig.interpolateProgress()) {
+            ease -= RrlsConfig.easing().invoke(this.currentProgress, RrlsConfig.easingArg());
+
+        } else if (this.fadeOutStart > -1L) {
+            float f = (float)(Util.getMillis() - this.fadeOutStart) / RrlsConfig.animationSpeed();
+            ease -= RrlsConfig.easing().invoke(Mth.clamp(f, 0.0F, 1.0F), RrlsConfig.easingArg());
+        }
+
+        int easeAlpha = Math.max(Math.round(ease * 255.0F), 4); // Fuck Font#adjustColor
+        int easeColor = ARGB.color(easeAlpha, 255, 255, 255);
+
         switch (RrlsConfig.type()) {
             case Type.PROGRESS -> {
                 int s = (int) ((double) j * 0.8325);
                 int r = (int) (Math.min(i * 0.75, j) * 0.5);
 
-                this.drawProgressBar(graphics, i / 2 - r, s - 5, i / 2 + r, s + 5, this.rrls$fadeOutTime);
+                this.drawProgressBar(graphics, i / 2 - r, s - 5, i / 2 + r, s + 5, ease);
             }
 
             case Type.TEXT -> graphics.drawCenteredString(
                     minecraft.font, RrlsConfig.reloadText(), i / 2, 70,
-                    RrlsConfig.rgbProgress() ? RainbowUtils.rainbowColor() : -1
+                    RrlsConfig.rgbProgress() ? RainbowUtils.rainbowColor(easeAlpha) : easeColor
             );
 
             case Type.TEXT_WITH_BACKGROUND -> {
@@ -99,13 +107,14 @@ public abstract class LoadingOverlayMixin extends Overlay {
                     rrls$textWidget.setMaxWidth(i);
                     rrls$textWidget.setX(i / 2 - rrls$textWidget.getWidth() / 2);
                     rrls$textWidget.setY(j - j / 3);
+                    rrls$textWidget.setColor(easeColor);
 
                     if (RrlsConfig.rgbProgress())
-                        rrls$textWidget.setColor(RainbowUtils.rainbowColor());
+                        rrls$textWidget.setColor(RainbowUtils.rainbowColor(easeAlpha));
 
                     // This will make sure the widget is rendered above other widgets in Pause screen
                     graphics.pose().pushPose();
-                    graphics.pose().translate(0, 0,255);
+                    graphics.pose().translate(0, 0, 255);
 
                     rrls$textWidget.render(graphics, 0, 0, partialTick);
 
@@ -132,18 +141,6 @@ public abstract class LoadingOverlayMixin extends Overlay {
     public void rrls$render(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (rrls$getState() != OverlayHelper.State.DEFAULT) // Update attach (Optifine ❤️)
             rrls$setState(OverlayHelper.lookupState(minecraft.screen, rrls$getState() != OverlayHelper.State.WAIT));
-    }
-
-    @Inject(
-            method = "render",
-            at = @At(
-                    value = "FIELD",
-                    target = "Lnet/minecraft/client/gui/screens/LoadingOverlay;fadeInStart:J",
-                    ordinal = 2
-            )
-    )
-    public void rrls$hookPartialTick(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci, @Local(ordinal = 1) float f) {
-        this.rrls$fadeOutTime = 1.0F - Mth.clamp(f, 0.0F, 1.0F);
     }
 
     @WrapWithCondition(
@@ -202,12 +199,27 @@ public abstract class LoadingOverlayMixin extends Overlay {
             method = "drawProgressBar",
             at = @At(
                     value = "INVOKE",
+                    target = "Ljava/lang/Math;round(F)I"
+            )
+    )
+    public int rrls$lerp(float i, Operation<Integer> original, @Local(argsOnly = true) float partialTick) {
+        if (RrlsConfig.interpolateProgress()) {
+            return Mth.ceil(Mth.lerp(partialTick, 0.0F, 255.0F));
+        }
+
+        return original.call(i);
+    }
+
+    @WrapOperation(
+            method = "drawProgressBar",
+            at = @At(
+                    value = "INVOKE",
                     target = "Lnet/minecraft/util/ARGB;color(IIII)I"
             )
     )
-    public int rrls$rainbowProgress(int alpha, int red, int green, int blue, Operation<Integer> original) {
+    public int rrls$rainbowProgress(int alpha, int red, int green, int blue, Operation<Integer> original, @Local(argsOnly = true) float partialTick) {
         if (RrlsConfig.rgbProgress() && rrls$getState() != OverlayHelper.State.DEFAULT) {
-            return replaceAlpha(RainbowUtils.rainbowColor(), alpha);
+            return RainbowUtils.rainbowColor(partialTick);
         }
 
         return original.call(alpha, red, green, blue);

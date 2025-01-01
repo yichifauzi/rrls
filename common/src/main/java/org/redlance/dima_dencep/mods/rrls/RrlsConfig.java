@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.redlance.dima_dencep.mods.rrls.config.DoubleLoad;
 import org.redlance.dima_dencep.mods.rrls.config.HideType;
 import org.redlance.dima_dencep.mods.rrls.config.Type;
+import org.redlance.dima_dencep.mods.rrls.utils.Ease;
 
 public class RrlsConfig {
     public static final Pair<RrlsConfig, ModConfigSpec> CONFIG_SPEC_PAIR = new ModConfigSpec.Builder()
@@ -31,6 +32,11 @@ public class RrlsConfig {
     public final ModConfigSpec.BooleanValue rgbProgress;
     public final ModConfigSpec.ConfigValue<String> reloadText;
     public final ModConfigSpec.ConfigValue<Double> animationSpeed;
+
+    // Interpolation
+    public final ModConfigSpec.BooleanValue interpolateProgress;
+    public final ModConfigSpec.EnumValue<Ease> ease;
+    public final ModConfigSpec.ConfigValue<Double> easingArg;
 
     // Other
     public final ModConfigSpec.BooleanValue resetResources;
@@ -54,6 +60,12 @@ public class RrlsConfig {
         this.rgbProgress = builder.define("rgbProgress", false);
         this.reloadText = builder.define("reloadText", "Edit in config!");
         this.animationSpeed = builder.define("animationSpeed", 1000.0);
+        builder.pop();
+
+        builder.push("interpolation");
+        this.interpolateProgress = builder.define("interpolateProgress", false);
+        this.ease = builder.defineEnum("ease", Ease.OUTCIRC);
+        this.easingArg = builder.define("easingArg", Double.NaN, RrlsConfig::isFloatLike);
         builder.pop();
 
         builder.push("other");
@@ -96,6 +108,23 @@ public class RrlsConfig {
         return CONFIG_SPEC_PAIR.getKey().reloadText.get();
     }
 
+    public static boolean interpolateProgress() {
+        return CONFIG_SPEC_PAIR.getKey().interpolateProgress.get();
+    }
+
+    public static Ease easing() {
+        return CONFIG_SPEC_PAIR.getKey().ease.get();
+    }
+
+    public static Float easingArg() {
+        float easingArg = CONFIG_SPEC_PAIR.getKey().easingArg.get().floatValue();
+        if (Float.isNaN(easingArg)) {
+            return null;
+        }
+
+        return easingArg;
+    }
+
     public static float animationSpeed() {
         return CONFIG_SPEC_PAIR.getKey().animationSpeed.get()
                 .floatValue();
@@ -119,5 +148,25 @@ public class RrlsConfig {
 
     public static boolean skipForgeOverlay() {
         return CONFIG_SPEC_PAIR.getKey().skipForgeOverlay.get();
+    }
+
+    private static boolean isFloatLike(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        return switch (obj) {
+            case Float ignored -> true;
+            case Double ignored -> true;
+            case String str -> {
+                try {
+                    Float.valueOf(str);
+                    yield true;
+                } catch (Throwable th) {
+                    yield false;
+                }
+            }
+            default -> false;
+        };
     }
 }
