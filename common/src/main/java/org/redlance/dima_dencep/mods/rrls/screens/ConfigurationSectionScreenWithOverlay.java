@@ -77,6 +77,6 @@ public class ConfigurationSectionScreenWithOverlay extends ConfigurationScreen.C
 
     @Override
     public boolean isDone() {
-        return this.minecraft != null && this.minecraft.overlay == this.overlay && this.currentProgress > 5.0F;
+        return this.minecraft != null && this.minecraft.overlay == this.overlay && this.currentProgress > 1.5F;
     }
 }

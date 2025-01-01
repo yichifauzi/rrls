@@ -35,6 +35,7 @@ public class RrlsConfig {
 
     // Interpolation
     public final ModConfigSpec.BooleanValue interpolateProgress;
+    public final ModConfigSpec.BooleanValue interpolateAtEnd;
     public final ModConfigSpec.EnumValue<Ease> ease;
     public final ModConfigSpec.ConfigValue<Double> easingArg;
 
@@ -64,7 +65,8 @@ public class RrlsConfig {
 
         builder.push("interpolation");
         this.interpolateProgress = builder.define("interpolateProgress", false);
-        this.ease = builder.defineEnum("ease", Ease.OUTCIRC);
+        this.interpolateAtEnd = builder.define("interpolateAtEnd", true);
+        this.ease = builder.defineEnum("ease", Ease.INOUTQUINT);
         this.easingArg = builder.define("easingArg", Double.NaN, RrlsConfig::isFloatLike);
         builder.pop();
 
@@ -110,6 +112,10 @@ public class RrlsConfig {
 
     public static boolean interpolateProgress() {
         return CONFIG_SPEC_PAIR.getKey().interpolateProgress.get();
+    }
+
+    public static boolean interpolateAtEnd() {
+        return CONFIG_SPEC_PAIR.getKey().interpolateAtEnd.get();
     }
 
     public static Ease easing() {

@@ -15,6 +15,8 @@
   "rrls.configuration.reloadText": "Текст, который будет отображаться, если выше выбран пункт TEXT",
   "rrls.configuration.interpolateProgress": "Интерполировать прогресс",
   "rrls.configuration.interpolateProgress.tooltip": "В ванильном minecraft интерполяция начинается с ~75%, включите ее, если хотите делать интерполяцию на основе прогресса.\nЭто может привести к раннему затуханию, но необходимо для некоторых изингов.",
+  "rrls.configuration.interpolateAtEnd": "Интерполировать в конце",
+  "rrls.configuration.interpolateAtEnd.tooltip": "Начинать интерполяцию только тогда, когда индикатор выполнения полностью заполнится.",
   "rrls.configuration.ease": "Изинг",
   "rrls.configuration.ease.tooltip": "См. https://easings.net/",
   "rrls.configuration.easingArg": "Аргумент изинга",

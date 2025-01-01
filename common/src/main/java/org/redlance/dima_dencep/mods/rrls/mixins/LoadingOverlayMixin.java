@@ -16,6 +16,7 @@ import net.minecraft.client.gui.components.FocusableTextWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import org.objectweb.asm.Opcodes;
 import org.redlance.dima_dencep.mods.rrls.RrlsConfig;
 import org.redlance.dima_dencep.mods.rrls.config.Type;
 import org.redlance.dima_dencep.mods.rrls.utils.DummyGuiGraphics;
@@ -56,8 +57,11 @@ public abstract class LoadingOverlayMixin extends Overlay {
     private long fadeInStart;
     @Shadow
     public abstract void drawProgressBar(GuiGraphics guiGraphics, int minX, int minY, int maxX, int maxY, float partialTick);
+
     @Unique
     private FocusableTextWidget rrls$textWidget;
+    @Unique
+    private boolean rrls$isFinished;
 
     @Inject(
             method = "<init>",
@@ -223,6 +227,39 @@ public abstract class LoadingOverlayMixin extends Overlay {
         }
 
         return original.call(alpha, red, green, blue);
+    }
+
+    @WrapOperation(
+            method = "render",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/gui/screens/LoadingOverlay;fadeOutStart:J",
+                    ordinal = 2
+            )
+    )
+    public long rrls$(LoadingOverlay instance, Operation<Long> original) {
+        if (this.fadeOutStart == -1L && this.currentProgress >= 0.999F) {
+            this.fadeOutStart = Util.getMillis();
+        }
+        if (RrlsConfig.interpolateAtEnd()) {
+            return this.rrls$isFinished ? 1L : -1L;
+        }
+        return original.call(instance);
+    }
+
+    @WrapOperation(
+            method = "render",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/gui/screens/LoadingOverlay;fadeOutStart:J",
+                    opcode = Opcodes.PUTFIELD
+            )
+    )
+    public void rrls$(LoadingOverlay instance, long value, Operation<Void> original) {
+        this.rrls$isFinished = true;
+        if (!RrlsConfig.interpolateAtEnd()) {
+            original.call(instance, value);
+        }
     }
 
     @ModifyConstant(
