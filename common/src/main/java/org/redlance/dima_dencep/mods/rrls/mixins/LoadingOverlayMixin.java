@@ -77,7 +77,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
     }
 
     @Override
-    public void rrls$miniRender(GuiGraphics graphics) {
+    public void rrls$miniRender(GuiGraphics graphics, float partialTick) {
         int i = graphics.guiWidth();
         int j = graphics.guiHeight();
 
@@ -107,7 +107,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                     graphics.pose().pushPose();
                     graphics.pose().translate(0, 0,255);
 
-                    rrls$textWidget.render(graphics, 0, 0, this.rrls$fadeOutTime);
+                    rrls$textWidget.render(graphics, 0, 0, partialTick);
 
                     graphics.pose().popPose();
                 }

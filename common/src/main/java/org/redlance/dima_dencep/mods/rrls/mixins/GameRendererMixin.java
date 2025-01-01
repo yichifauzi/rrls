@@ -52,7 +52,7 @@ public class GameRendererMixin {
                 ));
 
                 if (RrlsConfig.miniRender())
-                    overlay.rrls$miniRender(graphics);
+                    overlay.rrls$miniRender(graphics, deltaTracker.getGameTimeDeltaTicks());
             }
 
         } catch (RuntimeException ex) {
