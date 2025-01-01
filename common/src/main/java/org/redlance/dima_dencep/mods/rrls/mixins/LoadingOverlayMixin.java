@@ -237,7 +237,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                     ordinal = 2
             )
     )
-    public long rrls$(LoadingOverlay instance, Operation<Long> original) {
+    public long rrls$interpolateAtEnd(LoadingOverlay instance, Operation<Long> original) {
         if (this.fadeOutStart == -1L && this.currentProgress >= 0.999F) {
             this.fadeOutStart = Util.getMillis();
         }
