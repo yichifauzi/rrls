@@ -90,7 +90,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
             ease -= RrlsConfig.easing().invoke(Mth.clamp(f, 0.0F, 1.0F), RrlsConfig.easingArg());
         }
 
-        int easeAlpha = Math.max(Math.round(ease * 255.0F), 4); // Fuck Font#adjustColor
+        int easeAlpha = Mth.ceil(Mth.lerp(ease, 4.0F /* Fuck Font#adjustColor */, 255.0F));
         int easeColor = ARGB.color(easeAlpha, 255, 255, 255);
 
         switch (RrlsConfig.type()) {
