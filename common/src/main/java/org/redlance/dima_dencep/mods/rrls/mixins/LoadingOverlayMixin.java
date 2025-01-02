@@ -90,6 +90,10 @@ public abstract class LoadingOverlayMixin extends Overlay {
             ease -= RrlsConfig.easing().invoke(Mth.clamp(f, 0.0F, 1.0F), RrlsConfig.easingArg());
         }
 
+        if (this.rrls$isFinished && ease <= 0.0F) {
+            this.minecraft.setOverlay(null);
+        }
+
         int easeAlpha = Mth.ceil(Mth.lerp(ease, 4.0F /* Fuck Font#adjustColor */, 255.0F));
         int easeColor = ARGB.color(easeAlpha, 255, 255, 255);
 
@@ -162,6 +166,17 @@ public abstract class LoadingOverlayMixin extends Overlay {
             method = "render",
             at = @At(
                     value = "INVOKE",
+                    target = "Lnet/minecraft/client/Minecraft;setOverlay(Lnet/minecraft/client/gui/screens/Overlay;)V"
+            )
+    )
+    public boolean rrls$reinitScreen(Minecraft instance, Overlay loadingGui) {
+        return rrls$getState() == OverlayHelper.State.DEFAULT || this.currentProgress >= 0.999F;
+    }
+
+    @WrapWithCondition(
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/screens/Screen;init(Lnet/minecraft/client/Minecraft;II)V"
             )
     )
@@ -207,8 +222,8 @@ public abstract class LoadingOverlayMixin extends Overlay {
             )
     )
     public int rrls$lerp(float i, Operation<Integer> original, @Local(argsOnly = true) float partialTick) {
-        if (RrlsConfig.interpolateProgress()) {
-            return Mth.ceil(Mth.lerp(partialTick, 0.0F, 255.0F));
+        if (rrls$getState() != OverlayHelper.State.DEFAULT) {
+            return original.call(Mth.lerp(partialTick, 0.0F, 255.0F));
         }
 
         return original.call(i);
